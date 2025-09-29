@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hyunberry's Random Video Roulette</title>
+  <!-- Import Press Start 2P font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Press Start 2P', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      background: #ffc0d9; /* slightly darker pastel pink */
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .title, .loading {
+      position: relative;
+      z-index: 2;
+      color: #ffffff;
+      text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff8fc1;
+    }
+
+    .title {
+      font-size: 2em;
+      margin-bottom: 1em;
+    }
+
+    .loading {
+      font-size: 1.2em;
+      margin-top: 0.5em;
+    }
+
+    img {
+      max-width: 200px;
+      border-radius: 15px;
+      margin-bottom: 1em;
+      animation: spin 3s linear infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Star sparkle in background */
+    .sparkle {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: transparent;
+      pointer-events: none;
+      z-index: 1; /* behind text and image */
+    }
+
+    .sparkle:before, .sparkle:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 3px; /* bigger stars */
+      background: white;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .sparkle:after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    @keyframes sparkleAnim {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <div class="title" id="title">Hyunberry's Random Video Roulette</div>
+  <img src="https://i.imgur.com/TTsfUzK.png" alt="Roulette Image">
+  <div class="loading" id="loading">Loading 1 random video out of 100...</div>
+
+  <script>
+    const videos = [
+      "LRKKhZsGVyU","yRxWqmqg4PE","Tx4a8edq52Q","3LGdFKIXr9I",
+      "pcp11ls-nrg","mRlOCKZj-O8","c1v1AP3JzYQ","QUhLUqgppKY",
+      "FZYh6lPymJ0","0Vsj5L4CgX8","_Va2KJeByUQ","1m6MFz4-LvE",
+      "APn0hmrfg1E","VoKNTTgnOjA","P8jUZ2Qm_6c","RSp-Wj8tz-s",
+      "g2IyGTc4-FY","UoeWjKIxo8s","oLxe9yCiIB8","Hweqfxsrgac",
+      "T39gDeegNn0","n1KAkObKrsY","2v98g8QcF_0","AcLw_Cp6gnQ",
+      "BJnmk-oUW_k","W1ValKNYw_U","ds0lC7k21pg","Pj0h1xRzbvs",
+      "vEEMR88QYao","knge_1uWbro","6Z3NUjmGssQ","rQgoFj-0Veo",
+      "pIq6Tu9PZmM","xFsULdmtFqo","s-aeFLlxcSk","-Kljmrtp9L8",
+      "f-A989FqyxI","xxVggHle9kQ","hrO1saAMjq0","vROiBp6ajNg",
+      "LYGhTDLEAok","fW47QpWTgIE","njbRswXpSwA","3yp17XEP5ck",
+      "y-rPpGpnSg0","-uqWaGzQyxA",
+      "kNgEEsby8fo","80H_-aHTUws","UOMC2ZO0Frw","M9yhIVef7qA",
+      "e4ay8mZ7ywE","qzdPTjk9aTg","qh-EqX6pSzQ","fiCRhszDHlM",
+      "6KynXlU2M4A","C8qZXCHP6WY","idf9uPTPkAo","-rozM6G-y0Y",
+      "yLJ2UuPLjJA","xYG7O2okHVQ","_fKcdwyysyY","JszKbqxb484",
+      "u31uURkbpdY","bu66SHX1h8E","i-p-Pd6Udvc","FcBzQ8NjYbc",
+      "-RkSy_YTJJk","bEMVHUbkkIk","y3utR7pge-A","wMK_fJjdTpM",
+      "bnP_a1hjTgg","-SjPVVeNdKY","nF-xdiL7Nr0","QiaC0jpQ4Kg",
+      "TW3YcBmwC-k","qInIr2fm6IY","md8nInMGhFY","GqaVeuLRDGI",
+      "KAHyptnH5dQ","CD1DB_fILYg","mCw2z7NvvHc","94vIKBfX9hI",
+      "xV-TOIXgoYU","jzl5VfE80go","De_S2dQw19s","JALAKvn9tSY",
+      "w9CMqN04b38","ZxwtRXVY8Qk","8hgDPV6wNZM","sfdhWfRT_Y8",
+      "-zSqmygaH7o","c0DrqHn5WXo","CcWI3zjl4XA","sCAc_zXCOp0",
+      "1Qm7QmLVrc4","3ydlJCDBk3Q","lE_AaXTfA2U","d_LLcKmJ7v8",
+      "RKI_m4NFqUM","FGQ595x20XA"
+    ];
+
+    const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+
+    // Redirect after 3 seconds
+    setTimeout(() => {
+      window.location.href = `https://www.youtube.com/watch?v=${randomVideo}`;
+    }, 3000);
+
+    // Background sparkles
+    function createSparkle() {
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle');
+      sparkle.style.left = Math.random() * window.innerWidth + 'px';
+      sparkle.style.top = Math.random() * window.innerHeight + 'px';
+      sparkle.style.width = sparkle.style.height = (12 + Math.random() * 10) + 'px';
+      sparkle.style.animation = `sparkleAnim ${0.8 + Math.random()}s linear infinite`;
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 2000);
+    }
+
+    setInterval(createSparkle, 150);
+  </script>
+</body>
+</html>
